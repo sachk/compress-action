@@ -1,13 +1,19 @@
-FROM alpine
+FROM alpine as builder
 
-LABEL maintainer="Stef Heyenrath"
+LABEL maintainer="Sacha Korban"
 
-RUN apk add bash
-RUN apk add brotli
-RUN apk add gzip
+RUN apk add --no-cache make gcc musl-dev git && \
+	mkdir /build/ && cd /build/ && \
+	git clone https://github.com/ebiggers/libdeflate.git && \
+	cd libdeflate/ && make
 
-COPY entrypoint.sh /entrypoint.sh
+FROM python:alpine
 
-RUN chmod +x /entrypoint.sh
+COPY entrypoint.py /entrypoint.py
 
-ENTRYPOINT ["/entrypoint.sh"]
+COPY --from=builder /build/libdeflate/gzip /usr/local/bin/
+
+RUN chmod +x /entrypoint.py && \
+    apk add --no-cache brotli
+
+ENTRYPOINT ["python3", "/entrypoint.py"]
