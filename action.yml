@@ -1,36 +1,27 @@
-name: 'ghaction-CompressFiles'
+name: 'compress-action-minratio'
 description: 'A GitHub Action for compressing files using Brotli or GZip compression.'
-author: 'sheyenrath'
+author: 'sachk'
 branding:
-  icon: 'archive'  
+  icon: 'archive'
   color: 'purple'
 inputs:
   path:
-    description: 'The path'
+    description: 'The path containing the files to compress'
     required: true
     default: '.'
-  extensions:
-    description: 'The file extensions to compress.'
+  compressors:
+    description: 'List of compressors to use'
     required: false
-    default: '.js,.css,.html,.json'
-  tools:
-    description: 'The compression utility to use.'
+    default: 'gzip,brotli'
+  minRatio:
+    description: 'Minimum compression ratio'
     required: false
-    default: 'brotli,gzip'
-  depth:
-    description: 'Maximum folder depth to process'
-    required: false
-    default: '3'
-  deterministicCompression:
-    description: 'When using "gzip", do not save or restore the original name and timestamp.'
-    required: false
-    default: 'false'
+    default: '1.2'
+
 runs:
   using: 'docker'
-  image: 'docker://sheyenrath/ghaction-compress-files:2'
+  image: 'docker://ghcr.io/sachk/compress-action:1'
   args:
     - ${{ inputs.path }}
-    - ${{ inputs.extensions }}
-    - ${{ inputs.tools }}
-    - ${{ inputs.depth }}
-    - ${{ inputs.deterministicCompression }}
+    - ${{ inputs.compressors }}
+    - ${{ inputs.minRatio }}
